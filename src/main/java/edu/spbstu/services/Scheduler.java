@@ -11,10 +11,10 @@ import java.util.concurrent.BlockingQueue;
 public class Scheduler {
     private final List<BlockingQueue<AbstractTask>> taskQueues;
 
-    public Scheduler(int numPriorities) {
+    public Scheduler() {
         taskQueues = new ArrayList<>();
-        for (int i = 0; i < numPriorities; i++) {
-            taskQueues.add(new ArrayBlockingQueue<>(10));
+        for (int i = 0; i < 4; i++) {
+            taskQueues.add(new ArrayBlockingQueue<AbstractTask>(10));
         }
     }
 
