@@ -1,6 +1,6 @@
 package edu.spbstu.models;
 
-public abstract class AbstractTask implements Runnable{
+public abstract class AbstractTask {
     protected final int id;
     protected int priority;
     protected TaskState state;
@@ -31,4 +31,5 @@ public abstract class AbstractTask implements Runnable{
 
     public abstract TaskState terminate();
 
+    public abstract void executeTask();
 }

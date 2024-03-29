@@ -1,6 +1,6 @@
 package edu.spbstu.models;
 
-public class BaseTask extends AbstractTask{
+public class BaseTask extends AbstractTask {
     public BaseTask(int id, int priority) {
         super(id, priority);
     }
@@ -26,12 +26,18 @@ public class BaseTask extends AbstractTask{
     }
 
     @Override
-    public void run() {
+    public void executeTask() {
         // Логика выполнения задачи
         long sum = 0;
         for (int i = 0; i < 1000000; i++) {
             sum++;
         }
-        System.out.println("Task " + id + " executed with sum: " + sum);
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println("Task " + id + " with priority " + priority + " executed with sum: " + sum);
     }
 }

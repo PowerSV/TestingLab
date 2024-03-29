@@ -25,16 +25,16 @@ public class ExtendedTask extends AbstractTask{
         return null;
     }
 
+    @Override
+    public void executeTask() {
+
+    }
+
     public TaskState myWait() {
         return null;
     }
 
     public TaskState release() {
         return null;
-    }
-
-    @Override
-    public void run() {
-
     }
 }
