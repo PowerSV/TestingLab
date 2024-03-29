@@ -1,14 +1,14 @@
 package edu.spbstu.models;
 
-public abstract class AbstractTask {
+public abstract class AbstractTask implements Runnable{
     protected final String name;
     protected int priority;
     protected TaskState state;
 
-    public AbstractTask(String name, int priority, TaskState state) {
+    public AbstractTask(String name, int priority) {
         this.name = name;
         this.priority = priority;
-        this.state = state;
+        this.state = TaskState.SUSPENDED;
     }
 
     public String getName() {

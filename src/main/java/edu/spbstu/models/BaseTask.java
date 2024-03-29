@@ -1,8 +1,8 @@
 package edu.spbstu.models;
 
 public class BaseTask extends AbstractTask{
-    public BaseTask(String name, int priority, TaskState state) {
-        super(name, priority, state);
+    public BaseTask(String name, int priority) {
+        super(name, priority);
     }
 
     @Override
@@ -23,5 +23,10 @@ public class BaseTask extends AbstractTask{
     @Override
     public TaskState terminate() {
         return null;
+    }
+
+    @Override
+    public void run() {
+
     }
 }
