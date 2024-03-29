@@ -3,17 +3,18 @@ package edu.spbstu.services;
 import edu.spbstu.models.AbstractTask;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 public class Scheduler {
-    private final List<Queue<AbstractTask>> taskQueues;
+    private final List<BlockingQueue<AbstractTask>> taskQueues;
 
     public Scheduler(int numPriorities) {
         taskQueues = new ArrayList<>();
         for (int i = 0; i < numPriorities; i++) {
-            taskQueues.add(new LinkedList<>());
+            taskQueues.add(new ArrayBlockingQueue<>(10));
         }
     }
 
