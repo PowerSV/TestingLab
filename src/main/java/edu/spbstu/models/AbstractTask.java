@@ -1,35 +1,49 @@
 package edu.spbstu.models;
 
-public abstract class AbstractTask {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Random;
+
+public abstract class AbstractTask implements Runnable {
+    static final Logger LOGGER = LoggerFactory.getLogger(AbstractTask.class);
+    static final Random RANDOM = new Random();
+
     protected final int id;
     protected int priority;
-    protected TaskState state;
+
+    private Runnable runnable = null;
 
     public AbstractTask(int id, int priority) {
         this.id = id;
         this.priority = priority;
-        this.state = TaskState.SUSPENDED;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public int getPriority() {
         return priority;
     }
 
-    public TaskState getState() {
-        return state;
+    public void setRunnable(Runnable runnable) {
+        this.runnable = runnable;
     }
 
-    public void setState(TaskState state) {
-        this.state = state;
+    @Override
+    public void run() {
+        if (runnable == null) {
+            throw new IllegalStateException();
+        }
+        runnable.run();
     }
 
-    public abstract TaskState activate();
-
-    public abstract TaskState start();
-
-    public abstract TaskState preempt();
-
-    public abstract TaskState terminate();
-
-    public abstract void executeTask();
+    @Override
+    public String toString() {
+        return "AbstractTask{" +
+                "id=" + id +
+                ", priority=" + priority +
+                '}';
+    }
 }

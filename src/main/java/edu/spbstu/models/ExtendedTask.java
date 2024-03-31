@@ -21,7 +21,7 @@ public class ExtendedTask extends AbstractTask{
     }
 
     @Override
-    public TaskState terminate() {
+    public TaskState terminate(int sum) {
         return null;
     }
 
@@ -36,5 +36,10 @@ public class ExtendedTask extends AbstractTask{
 
     public TaskState release() {
         return null;
+    }
+
+    @Override
+    public void run() {
+        executeTask();
     }
 }
