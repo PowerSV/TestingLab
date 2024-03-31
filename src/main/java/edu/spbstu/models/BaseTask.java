@@ -3,41 +3,20 @@ package edu.spbstu.models;
 public class BaseTask extends AbstractTask {
     public BaseTask(int id, int priority) {
         super(id, priority);
+        setRunnable(getBaseTask());
     }
 
-    @Override
-    public TaskState activate() {
-        return null;
-    }
-
-    @Override
-    public TaskState start() {
-        return null;
-    }
-
-    @Override
-    public TaskState preempt() {
-        return null;
-    }
-
-    @Override
-    public TaskState terminate() {
-        return null;
-    }
-
-    @Override
-    public void executeTask() {
-        // Логика выполнения задачи
-        long sum = 0;
-        for (int i = 0; i < 1000000; i++) {
-            sum++;
-        }
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        System.out.println("Task " + id + " with priority " + priority + " executed with sum: " + sum);
+    public Runnable getBaseTask() {
+        return () -> {
+            long counter = 0;
+            long limit = 1_000_000 + RANDOM.nextInt(2_000_000);
+            for (int i = 0; i < limit; i++) {
+                if (Thread.currentThread().isInterrupted()) {
+                    return;
+                }
+                counter++;
+            }
+            LOGGER.info(this + " end with result = " + counter);
+        };
     }
 }

@@ -1,22 +1,24 @@
 package edu.spbstu;
 
-import edu.spbstu.services.TaskGenerator;
-import edu.spbstu.services.TaskScheduler;
+import edu.spbstu.models.BaseTask;
+import edu.spbstu.services.impl.TaskScheduler;
+
+import java.util.Random;
 
 public class App {
-    public static void main(String[] args) {
-        System.out.println("Hello World!");
+    public static void main(String[] args) throws InterruptedException {
+        System.out.println("Hello epta!");
 
+        Random random = new Random();
         int numPriorities = 4; // Количество уровней приоритета задач
 
         TaskScheduler scheduler = new TaskScheduler(numPriorities); // Создание планировщика
-        TaskGenerator taskGenerator = new TaskGenerator(scheduler); // Создание генератора задач
+        int id = 0;
+        while (true) {
+            int priority = random.nextInt(numPriorities);
+            scheduler.addTask(new BaseTask(priority, id++));
 
-        // Создание и запуск потоков
-        Thread generatorThread = new Thread(taskGenerator);
-        Thread schedulerThread = new Thread(scheduler);
-
-        generatorThread.start();
-        schedulerThread.start();
+            Thread.sleep(500 + random.nextInt(501));
+        }
     }
 }
