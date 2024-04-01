@@ -1,45 +1,8 @@
 package edu.spbstu.models;
 
-public class ExtendedTask extends AbstractTask{
-    public ExtendedTask(int id, int priority) {
-        super(id, priority);
-    }
+public class ExtendedTask extends AbstractTask {
 
-    @Override
-    public TaskState activate() {
-        return null;
-    }
-
-    @Override
-    public TaskState start() {
-        return null;
-    }
-
-    @Override
-    public TaskState preempt() {
-        return null;
-    }
-
-    @Override
-    public TaskState terminate(int sum) {
-        return null;
-    }
-
-    @Override
-    public void executeTask() {
-
-    }
-
-    public TaskState myWait() {
-        return null;
-    }
-
-    public TaskState release() {
-        return null;
-    }
-
-    @Override
-    public void run() {
-        executeTask();
+    public ExtendedTask(int priority) {
+        super(priority);
     }
 }

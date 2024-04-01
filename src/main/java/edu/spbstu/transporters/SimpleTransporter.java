@@ -3,9 +3,10 @@ package edu.spbstu.transporters;
 import edu.spbstu.models.AbstractTask;
 
 import java.util.concurrent.BlockingQueue;
+import java.util.function.Consumer;
 
-public class SimpleTransporter extends Transporter{
-    public SimpleTransporter(BlockingQueue<AbstractTask> producer, BlockingQueue<AbstractTask> consumer) {
+public class SimpleTransporter extends AbstractTransporter {
+    public SimpleTransporter(BlockingQueue<AbstractTask> producer, Consumer<AbstractTask> consumer) {
         super(producer, consumer);
     }
 
@@ -13,7 +14,7 @@ public class SimpleTransporter extends Transporter{
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
             try {
-                consumer.put(producer.take());
+                consumer.accept(producer.take());
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
