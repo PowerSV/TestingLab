@@ -1,8 +1,8 @@
 package edu.spbstu.models;
 
 public class BaseTask extends AbstractTask {
-    public BaseTask(int id, int priority) {
-        super(id, priority);
+    public BaseTask(int priority) {
+        super(priority);
         setRunnable(getBaseTask());
     }
 
@@ -15,6 +15,11 @@ public class BaseTask extends AbstractTask {
                     return;
                 }
                 counter++;
+            }
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
             LOGGER.info(this + " end with result = " + counter);
         };
