@@ -23,7 +23,7 @@ public class MultiPriorityBlockingQueue {
         }
     }
 
-    public AbstractTask takeFromReadyState() {
+    public AbstractTask take() {
         lock.lock();
         AbstractTask task = null;
         try {
@@ -48,7 +48,7 @@ public class MultiPriorityBlockingQueue {
         return task;
     }
 
-    public void putInReadyStateBlocking(AbstractTask task) {
+    public void put(AbstractTask task) {
         lock.lock();
         try {
             while (readyQueueSize >= READY_QUEUE_CAPACITY) {
@@ -65,7 +65,7 @@ public class MultiPriorityBlockingQueue {
         }
     }
 
-    public void putInReadyStateNonBlocking(AbstractTask task) {
+    public void add(AbstractTask task) {
         lock.lock();
         try {
             readyQueue.get(task.getPriority()).put(task);
@@ -76,4 +76,28 @@ public class MultiPriorityBlockingQueue {
             lock.unlock();
         }
     }
+
+    public AbstractTask peek() {
+        lock.lock();
+        AbstractTask task = null;
+        try {
+            while (readyQueueSize == 0) {
+                isEmptyCondition.await();
+            }
+            for (int i = readyQueue.size() - 1; i >= 0; i--) {
+                BlockingQueue<AbstractTask> queue = readyQueue.get(i);
+                if (!queue.isEmpty()) {
+                    task = queue.peek();
+                    break;
+                }
+            }
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } finally {
+            lock.unlock();
+        }
+
+        return task;
+    }
+
 }
