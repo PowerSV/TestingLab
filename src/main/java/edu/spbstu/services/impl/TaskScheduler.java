@@ -1,6 +1,7 @@
 package edu.spbstu.services.impl;
 
 import edu.spbstu.models.AbstractTask;
+import edu.spbstu.models.MultiPriorityBlockingQueue;
 import edu.spbstu.services.Processor;
 import edu.spbstu.services.TaskManager;
 import edu.spbstu.transporters.ReadyToRunningTransporter;
@@ -15,98 +16,40 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class TaskScheduler implements TaskManager {
+public class TaskScheduler {
     private static final int MAX_QUEUE_CAPACITY = 64;
-    private static final int READY_QUEUE_CAPACITY = 8;
-
-    private final List<BlockingQueue<AbstractTask>> readyQueue = new ArrayList<>();
-    private int readyQueueSize = 0;
-    private final Lock lock = new ReentrantLock();
-    private final Condition isFullCondition = lock.newCondition();
-    private final Condition isEmptyCondition = lock.newCondition();
 
     private final BlockingQueue<AbstractTask> waitingQueue = new ArrayBlockingQueue<>(MAX_QUEUE_CAPACITY);
     private final BlockingQueue<AbstractTask> suspendedQueue = new ArrayBlockingQueue<>(MAX_QUEUE_CAPACITY);
-    private final BlockingQueue<AbstractTask> runningQueue = new SynchronousQueue<>();
+    private final MultiPriorityBlockingQueue readyQueue;
+//    private final BlockingQueue<AbstractTask> runningQueue = new SynchronousQueue<>();
 
     public TaskScheduler(int numOfPriorities) {
-        for (int i = 0; i < numOfPriorities; i++) {
-            readyQueue.add(new ArrayBlockingQueue<>(MAX_QUEUE_CAPACITY));
-        }
+//        new ReadyToRunningTransporter(this::takeFromReadyState, this::putInRunningState).start();
+        readyQueue = new MultiPriorityBlockingQueue(numOfPriorities);
+        new SimpleTransporter(suspendedQueue, readyQueue::putInReadyStateBlocking).start();
 
-        new ReadyToRunningTransporter(this::takeFromReadyState, this::putInRunningState).start();
-        new SimpleTransporter(suspendedQueue, this::putInReadyStateBlocking).start();
-
-        new Processor(runningQueue, this).start();
+//        new Processor(readyQueue, this).start();
+        new Processor(readyQueue).start();
     }
 
     public void put(AbstractTask task) throws InterruptedException {
         suspendedQueue.put(task);
     }
 
-    public AbstractTask takeFromReadyState() {
-        lock.lock();
-        AbstractTask task = null;
-        try {
-            while (readyQueueSize == 0) {
-                isEmptyCondition.await();
-            }
-            for (int i = readyQueue.size() - 1; i >= 0; i--) {
-                BlockingQueue<AbstractTask> queue = readyQueue.get(i);
-                if (!queue.isEmpty()) {
-                    task = queue.take();
-                    readyQueueSize--;
-                    break;
-                }
-            }
-            isFullCondition.signalAll();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        } finally {
-            lock.unlock();
-        }
+//    @Override
+//    public void putInRunningState(AbstractTask task) {
+//        try {
+//            runningQueue.put(task);
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 
-        return task;
-    }
+//    @Override
+//
+//
+//    @Override
 
-    @Override
-    public void putInRunningState(AbstractTask task) {
-        try {
-            runningQueue.put(task);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public void putInReadyStateBlocking(AbstractTask task) {
-        lock.lock();
-        try {
-            while (readyQueueSize >= READY_QUEUE_CAPACITY) {
-                isFullCondition.await();
-            }
-
-            readyQueue.get(task.getPriority()).put(task);
-            readyQueueSize++;
-            isEmptyCondition.signalAll();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    @Override
-    public void putInReadyStateNonBlocking(AbstractTask task) {
-        lock.lock();
-        try {
-            readyQueue.get(task.getPriority()).put(task);
-            isEmptyCondition.signalAll();
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        } finally {
-            lock.unlock();
-        }
-    }
 }
 

@@ -17,7 +17,7 @@ public class BaseTask extends AbstractTask {
                 counter++;
             }
             try {
-                Thread.sleep(2000);
+                Thread.sleep(3000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

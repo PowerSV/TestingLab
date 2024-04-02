@@ -1,6 +1,7 @@
 package edu.spbstu.services;
 
 import edu.spbstu.models.AbstractTask;
+import edu.spbstu.models.MultiPriorityBlockingQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,34 +12,35 @@ public class Processor extends Thread {
 
     private ProcessingTask taskInProcess;
     private final ExecutorService executor;
-    private final BlockingQueue<AbstractTask> runningQueue;
-    private final TaskManager taskManager;
+//    private final BlockingQueue<AbstractTask> runningQueue;
+    private final MultiPriorityBlockingQueue readyQueue;
+//    private final TaskManager taskManager;
 
-    public Processor(BlockingQueue<AbstractTask> runningQueue, TaskManager taskManager) {
+//    public Processor(BlockingQueue<AbstractTask> runningQueue, TaskManager taskManager) {
+//        this.executor = Executors.newSingleThreadExecutor();
+//        this.taskManager = taskManager;
+//        this.runningQueue = runningQueue;
+//    }
+    public Processor(MultiPriorityBlockingQueue readyQueue) {
         this.executor = Executors.newSingleThreadExecutor();
-        this.taskManager = taskManager;
-        this.runningQueue = runningQueue;
+        this.readyQueue = readyQueue;
     }
 
     @Override
     public void run() {
         while (!Thread.currentThread().isInterrupted()) {
-            try {
-                AbstractTask nextTask = runningQueue.take();
-                while (true) {
-                    if (taskInProcess == null || taskInProcess.isCanceled() || taskInProcess.isDone()) {
-                        putTask(nextTask);
-                        break;
-                    } else if (taskInProcess.getTask().getPriority() < nextTask.getPriority()) {
-                        preempt(nextTask);
-                        break;
-                    }
-                    Thread.yield();
+            AbstractTask nextTask = readyQueue.takeFromReadyState();
+            while (true) {
+                if (taskInProcess == null || taskInProcess.isCanceled() || taskInProcess.isDone()) {
+                    putTask(nextTask);
+                    break;
+                } else if (taskInProcess.getTask().getPriority() < nextTask.getPriority()) {
+                    preempt(nextTask);
+                    break;
                 }
-                Thread.yield();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+                    Thread.yield();
             }
+            Thread.yield();
         }
     }
 
@@ -54,7 +56,8 @@ public class Processor extends Thread {
         taskInProcess.cancel();
         AbstractTask prevTask = taskInProcess.getTask();
         putTask(task);
-        taskManager.putInReadyStateBlocking(prevTask);
+//        taskManager.putInReadyStateBlocking(prevTask);
+        readyQueue.putInReadyStateBlocking(prevTask);
     }
 
     private static class ProcessingTask {
