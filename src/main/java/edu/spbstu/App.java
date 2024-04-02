@@ -10,12 +10,16 @@ public class App {
         TaskScheduler scheduler = new TaskScheduler(4);
 
         AbstractTask task1 = new BaseTask(0);
+        AbstractTask task5 = new BaseTask(0);
         AbstractTask task2 = new BaseTask(2);
         AbstractTask task3 = new BaseTask(3);
         AbstractTask task4 = new BaseTask(1);
 
         scheduler.put(task1);
+        scheduler.put(task5);
+        Thread.sleep(500);
         scheduler.put(task2);
+        Thread.sleep(500);
         scheduler.put(task3);
         scheduler.put(task4);
     }
