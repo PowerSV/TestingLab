@@ -69,6 +69,7 @@ public class MultiPriorityBlockingQueue {
         lock.lock();
         try {
             readyQueue.get(task.getPriority()).put(task);
+            readyQueueSize++;
             isEmptyCondition.signalAll();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);

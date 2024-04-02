@@ -5,6 +5,7 @@ import edu.spbstu.models.MultiPriorityBlockingQueue;
 import edu.spbstu.services.Processor;
 import edu.spbstu.services.TaskManager;
 import edu.spbstu.transporters.SimpleTransporter;
+import edu.spbstu.transporters.WaitingTransporter;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -18,7 +19,8 @@ public class TaskScheduler implements TaskManager {
 
     public TaskScheduler(int numOfPriorities) {
         readyQueue = new MultiPriorityBlockingQueue(numOfPriorities);
-        new SimpleTransporter(suspendedQueue, readyQueue::put).start();
+        new SimpleTransporter(suspendedQueue, this::putInReadyStateBlocking).start();
+        new WaitingTransporter(waitingQueue, this::putInReadyStateNonBlocking).start();
 
         new Processor(this).start();
     }
@@ -45,6 +47,11 @@ public class TaskScheduler implements TaskManager {
     @Override
     public AbstractTask takeFromReadyState() {
         return readyQueue.take();
+    }
+
+    @Override
+    public void putInWaitState(AbstractTask task) throws InterruptedException {
+        waitingQueue.put(task);
     }
 }
 

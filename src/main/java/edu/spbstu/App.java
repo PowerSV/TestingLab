@@ -2,12 +2,14 @@ package edu.spbstu;
 
 import edu.spbstu.models.AbstractTask;
 import edu.spbstu.models.BaseTask;
+import edu.spbstu.models.ExtendedTask;
 import edu.spbstu.services.impl.TaskScheduler;
 
 import java.util.Random;
 
 public class App {
 
+    // Example with BaseTsk only
 //    public static void main(String[] args) throws InterruptedException {
 //        TaskScheduler scheduler = new TaskScheduler(4);
 //
@@ -26,18 +28,27 @@ public class App {
 //        scheduler.put(task5);
 //    }
 
+    // Example with ExtendedTask
     public static void main(String[] args) throws InterruptedException {
-        System.out.println("Hello epta!");
+        TaskScheduler scheduler = new TaskScheduler(4);
 
-        Random random = new Random();
+        AbstractTask extendedTask1 = new ExtendedTask(1, scheduler);
+        AbstractTask task1 = new BaseTask(1);
 
-        TaskScheduler scheduler = new TaskScheduler(4); // Создание планировщика
-
-        while (true) {
-            int priority = random.nextInt(4);
-            scheduler.put(new BaseTask(priority));
-
-            Thread.sleep(500 + random.nextInt(501));
-        }
+        scheduler.put(extendedTask1);
+        scheduler.put(task1);
     }
+
+//    public static void main(String[] args) throws InterruptedException {//
+//        Random random = new Random();
+//
+//        TaskScheduler scheduler = new TaskScheduler(4); // Создание планировщика
+//
+//        while (true) {
+//            int priority = random.nextInt(4);
+//            scheduler.put(new BaseTask(priority));
+//
+//            Thread.sleep(500 + random.nextInt(501));
+//        }
+//    }
 }
