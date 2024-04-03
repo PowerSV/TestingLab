@@ -2,6 +2,9 @@ package edu.spbstu.models;
 
 import edu.spbstu.services.Waitable;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+
 public class ExtendedTask extends AbstractTask {
 
     private final Waitable waitStateProducer;
@@ -11,6 +14,7 @@ public class ExtendedTask extends AbstractTask {
     private boolean isWaiting = false;
     private long interruptTime;
     private long waitingTime;
+    private CountDownLatch readyLatch;
 
     public ExtendedTask(int priority, Waitable waitStateProducer) {
         super(priority);
@@ -32,9 +36,15 @@ public class ExtendedTask extends AbstractTask {
         return false;
     }
 
+    public void awaitReady() throws InterruptedException {
+        readyLatch.await();
+    }
+
     private Runnable getExtendedTask() {
         return () -> {
-            LOGGER.info("Continue: " + index);
+            if (index > 0) {
+                LOGGER.info("Continue: " + index);
+            }
             while (index < limit) {
                 if (Thread.currentThread().isInterrupted()) {
                     return;
@@ -46,12 +56,20 @@ public class ExtendedTask extends AbstractTask {
                     isWaiting = true;
                     waitingTime = getWaitingTime();
                     interruptTime = System.currentTimeMillis();
+                    readyLatch = new CountDownLatch(1);
 
                     try {
                         waitStateProducer.putInWaitState(this);
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
+
+                    Executors.newSingleThreadExecutor().submit(() -> {
+                        while (!isReady()) {
+                            Thread.yield();
+                        }
+                        readyLatch.countDown();
+                    });
                     return;
                 }
 
@@ -64,7 +82,6 @@ public class ExtendedTask extends AbstractTask {
     }
 
     private static boolean isWaitAction() { // With 0,001% probability.
-//        int rand = RANDOM.nextInt(1000000);
         int rand = RANDOM.nextInt(1_000_000);
         return rand > 999_990;
     }

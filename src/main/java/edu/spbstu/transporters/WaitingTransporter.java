@@ -16,9 +16,7 @@ public class WaitingTransporter extends AbstractTransporter {
         while (!Thread.currentThread().isInterrupted()) {
             try {
                 ExtendedTask task = (ExtendedTask) producer.take();
-                while (!task.isReady()) {
-                    Thread.yield();
-                }
+                task.awaitReady();
                 consumer.accept(task);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
