@@ -29,26 +29,30 @@ public class App {
 //    }
 
     // Example with ExtendedTask
-    public static void main(String[] args) throws InterruptedException {
-        TaskScheduler scheduler = new TaskScheduler(4);
-
-        AbstractTask extendedTask1 = new ExtendedTask(1, scheduler);
-        AbstractTask task1 = new BaseTask(1);
-
-        scheduler.put(extendedTask1);
-        scheduler.put(task1);
-    }
-
-//    public static void main(String[] args) throws InterruptedException {//
-//        Random random = new Random();
+//    public static void main(String[] args) throws InterruptedException {
+//        TaskScheduler scheduler = new TaskScheduler(4);
 //
-//        TaskScheduler scheduler = new TaskScheduler(4); // Создание планировщика
+//        AbstractTask extendedTask1 = new ExtendedTask(1, scheduler);
+//        AbstractTask task1 = new BaseTask(1);
 //
-//        while (true) {
-//            int priority = random.nextInt(4);
-//            scheduler.put(new BaseTask(priority));
-//
-//            Thread.sleep(500 + random.nextInt(501));
-//        }
+//        scheduler.put(extendedTask1);
+//        scheduler.put(task1);
 //    }
+
+    public static void main(String[] args) throws InterruptedException {//
+        Random random = new Random();
+
+        TaskScheduler scheduler = new TaskScheduler(4); // Создание планировщика
+
+        while (true) {
+            int priority = random.nextInt(4);
+
+            AbstractTask newTask = random.nextBoolean()
+                    ? new BaseTask(priority)
+                    : new ExtendedTask(priority, scheduler);
+            scheduler.put(newTask);
+
+            Thread.sleep(1000 + random.nextInt(501));
+        }
+    }
 }
