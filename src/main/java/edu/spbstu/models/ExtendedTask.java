@@ -61,6 +61,11 @@ public class ExtendedTask extends AbstractTask {
                 index++;
             }
 
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             LOGGER.info(this + " end with result = " + result);
         };
     }

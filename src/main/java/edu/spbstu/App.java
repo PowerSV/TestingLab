@@ -33,10 +33,13 @@ public class App {
         TaskScheduler scheduler = new TaskScheduler(4);
 
         AbstractTask extendedTask1 = new ExtendedTask(1, scheduler);
+        AbstractTask extendedTask2 = new ExtendedTask(3, scheduler);
         AbstractTask task1 = new BaseTask(1);
 
         scheduler.put(extendedTask1);
         scheduler.put(task1);
+        Thread.sleep(500);
+        scheduler.put(extendedTask2);
     }
 
 //    public static void main(String[] args) throws InterruptedException {//
