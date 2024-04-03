@@ -11,8 +11,6 @@ public class ExtendedTask extends AbstractTask {
     private final long limit = RANDOM.nextInt(1000) + 50000;
     private long result;
     private int index;
-    private boolean isWaiting = false;
-    private long interruptTime;
     private long waitingTime;
     private CountDownLatch readyLatch;
 
@@ -20,20 +18,6 @@ public class ExtendedTask extends AbstractTask {
         super(priority);
         setRunnable(getExtendedTask());
         this.waitStateProducer = waitStateProducer;
-    }
-
-    public boolean isReady() {
-        if (!isWaiting) {
-            return true;
-        }
-
-        long diff = System.currentTimeMillis() - interruptTime;
-        if (diff >= waitingTime) {
-            isWaiting = false;
-            return true;
-        }
-
-        return false;
     }
 
     public void awaitReady() throws InterruptedException {
@@ -53,9 +37,7 @@ public class ExtendedTask extends AbstractTask {
                 if (isWaitAction()) {
                     LOGGER.info("Waiting: " + index);
 
-                    isWaiting = true;
                     waitingTime = getWaitingTime();
-                    interruptTime = System.currentTimeMillis();
                     readyLatch = new CountDownLatch(1);
 
                     try {
@@ -65,8 +47,10 @@ public class ExtendedTask extends AbstractTask {
                     }
 
                     Executors.newSingleThreadExecutor().submit(() -> {
-                        while (!isReady()) {
-                            Thread.yield();
+                        try {
+                            Thread.sleep(waitingTime);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
                         }
                         readyLatch.countDown();
                     });
