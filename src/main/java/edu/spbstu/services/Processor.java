@@ -38,10 +38,14 @@ public class Processor extends Thread {
         }
     }
 
-    private void putTask(AbstractTask task) {
+    public void putTask(AbstractTask task) {
         LOGGER.info("Start process task " + task);
 
         taskInProcess = new ProcessingTask(task, executor.submit(task));
+    }
+
+    public ProcessingTask getTaskInProcess() {
+        return taskInProcess;
     }
 
     private void preempt(AbstractTask task) {
@@ -53,7 +57,7 @@ public class Processor extends Thread {
         taskManager.putInReadyStateBlocking(prevTask);
     }
 
-    private static class ProcessingTask {
+    public static class ProcessingTask {
         AbstractTask task;
         Future<?> future;
 

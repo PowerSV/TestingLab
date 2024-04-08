@@ -24,7 +24,7 @@ public class ExtendedTask extends AbstractTask {
         readyLatch.await();
     }
 
-    private Runnable getExtendedTask() {
+    public Runnable getExtendedTask() {
         return () -> {
             if (index > 0) {
                 LOGGER.info("Continue: " + index);
@@ -68,6 +68,10 @@ public class ExtendedTask extends AbstractTask {
             }
             LOGGER.info(this + " end with result = " + result);
         };
+    }
+
+    public boolean isWaiting() {
+        return waitingTime > 0;
     }
 
     private static boolean isWaitAction() { // With 0,001% probability.

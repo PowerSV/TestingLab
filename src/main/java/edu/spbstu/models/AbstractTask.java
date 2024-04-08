@@ -20,10 +20,6 @@ public abstract class AbstractTask implements Runnable {
         this.priority = priority;
     }
 
-    public int getId() {
-        return id;
-    }
-
     public int getPriority() {
         return priority;
     }

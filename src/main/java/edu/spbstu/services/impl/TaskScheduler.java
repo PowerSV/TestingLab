@@ -16,17 +16,31 @@ public class TaskScheduler implements TaskManager {
     private final BlockingQueue<AbstractTask> waitingQueue = new ArrayBlockingQueue<>(MAX_QUEUE_CAPACITY);
     private final BlockingQueue<AbstractTask> suspendedQueue = new ArrayBlockingQueue<>(MAX_QUEUE_CAPACITY);
     private final MultiPriorityBlockingQueue readyQueue;
+    private final Processor processor;
 
     public TaskScheduler(int numOfPriorities) {
         readyQueue = new MultiPriorityBlockingQueue(numOfPriorities);
         new SimpleTransporter(suspendedQueue, this::putInReadyStateBlocking).start();
         new WaitingTransporter(waitingQueue, this::putInReadyStateNonBlocking).start();
 
-        new Processor(this).start();
+        this.processor = new Processor(this);
+        processor.start();
     }
 
     public void put(AbstractTask task) throws InterruptedException {
         suspendedQueue.put(task);
+    }
+
+    public Processor getProcessor() {
+        return processor;
+    }
+
+    public BlockingQueue<AbstractTask> getWaitingQueue() {
+        return waitingQueue;
+    }
+
+    public BlockingQueue<AbstractTask> getSuspendedQueue() {
+        return suspendedQueue;
     }
 
     @Override
