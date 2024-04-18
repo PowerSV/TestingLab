@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class BaseTaskTest {
 
     @Test
-    public void testExtendedTaskExecution() {
+    public void testBaseTaskExecution() {
         BaseTask task = new BaseTask(3);
 
         Thread thread = new Thread(task.getBaseTask());
@@ -24,7 +24,7 @@ public class BaseTaskTest {
     }
 
     @Test
-    public void testExtendedTaskInterruption() throws InterruptedException {
+    public void testBaseTaskInterruption() throws InterruptedException {
         BaseTask task = new BaseTask(3);
 
         Thread thread = new Thread(task.getBaseTask());
